@@ -2,6 +2,7 @@
   "FDE": {
     "Title": "Encounter Forge",
     "Keybinding": "Open Encounter Forge",
+    "Minimize": "Minimize / restore",
     "World": "World",
     "Party": "Party & Allies",
     "Character": "Character",

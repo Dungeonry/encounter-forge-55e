@@ -35,7 +35,8 @@ export class EncounterBuilder extends HandlebarsApplicationMixin(ApplicationV2) 
       deleteSaved: EncounterBuilder.#onDeleteSaved,
       openSheet: EncounterBuilder.#onOpenSheet,
       sources: EncounterBuilder.#onSources,
-      resetFilters: EncounterBuilder.#onResetFilters
+      resetFilters: EncounterBuilder.#onResetFilters,
+      toggleMinimize: EncounterBuilder.#onToggleMinimize
     }
   };
 
@@ -177,6 +178,29 @@ export class EncounterBuilder extends HandlebarsApplicationMixin(ApplicationV2) 
   /* -------------------------------------------- */
   /*  Rendering & listeners                        */
   /* -------------------------------------------- */
+
+  /** ApplicationV2 only minimizes on title-bar double-click; add a visible button beside Close. */
+  async _renderFrame(options) {
+    const frame = await super._renderFrame(options);
+    const close = this.window?.close ?? frame.querySelector('[data-action="close"]');
+    if (close) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "header-control icon fa-solid fa-window-minimize";
+      btn.dataset.action = "toggleMinimize";
+      btn.dataset.tooltip = game.i18n.localize("FDE.Minimize");
+      btn.setAttribute("aria-label", btn.dataset.tooltip);
+      close.before(btn);
+    }
+    return frame;
+  }
+
+  static async #onToggleMinimize(event, target) {
+    if (this.minimized) await this.maximize();
+    else await this.minimize();
+    target.classList.toggle("fa-window-minimize", !this.minimized);
+    target.classList.toggle("fa-window-maximize", this.minimized);
+  }
 
   /**
    * Listeners are delegated from the window element, which survives partial re-renders
