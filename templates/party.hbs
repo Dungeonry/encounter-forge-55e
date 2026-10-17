@@ -41,11 +41,6 @@
 
   <section class="fde-generator">
     <h4><i class="fa-solid fa-dice-d20"></i> {{localize "FDE.Generator"}}</h4>
-    <label>{{localize "FDE.Shape"}}
-      <select data-field="gen.template">
-        {{#each templates}}<option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
-      </select>
-    </label>
     <label>{{localize "FDE.MaxCR"}}
       <select data-field="gen.crOffset" data-tooltip="{{localize "FDE.MaxCRHint"}}">
         {{#each crOffsets}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{localize "FDE.PartyLevel"}} {{label}}</option>{{/each}}

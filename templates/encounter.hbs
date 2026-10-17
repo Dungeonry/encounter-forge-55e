@@ -16,7 +16,18 @@
       </button>
       {{/each}}
     </div>
-    <button type="button" class="fde-generate" data-action="generate"><i class="fa-solid fa-wand-magic-sparkles"></i> {{localize "FDE.Generate"}}</button>
+  </div>
+
+  <div class="fde-target">
+    <span class="fde-target-label">{{localize "FDE.Shape"}}</span>
+    <div class="fde-shapes">
+      {{#each templates}}
+      <button type="button" class="{{#if selected}}active{{/if}}" data-action="setShape" data-shape="{{key}}" data-tooltip="{{hint}}">
+        <i class="fa-solid {{icon}}"></i> {{label}}
+      </button>
+      {{/each}}
+    </div>
+    <button type="button" class="fde-generate" data-action="generate" data-tooltip="{{localize "FDE.GenerateHint"}}"><i class="fa-solid fa-wand-magic-sparkles"></i> {{localize "FDE.Generate"}}</button>
   </div>
 
   <div class="fde-rating rating-{{evaluation.rating}}">

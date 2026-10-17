@@ -19,15 +19,30 @@ export const TEMPLATES = Object.freeze({
   elite: { groups: [{ share: 1, min: 2, max: 3 }] },
   squad: { groups: [{ share: 0.45, min: 1, max: 2 }, { share: 0.55, min: 2, max: 4 }] },
   mixed: { groups: [{ share: 0.4, min: 1, max: 1 }, { share: 0.3, min: 1, max: 2 }, { share: 0.3, min: 2, max: 3 }] },
-  horde: { groups: [{ share: 1, min: "party", max: "party2" }] }
+  horde: { groups: [{ share: 1, min: "party", max: "party2" }] },
+  /** No fixed structure: 1-4 different creatures, random XP split, random counts. Rolled fresh each attempt. */
+  wild:  { dynamic: true }
 });
+
+/** Roll a one-off shape for "wild". */
+function wildShape(rng) {
+  const k = 1 + Math.floor(rng() * 4);
+  const weights = Array.from({ length: k }, () => 0.2 + rng());
+  const total = weights.reduce((s, w) => s + w, 0);
+  return {
+    groups: weights.map(w => {
+      const min = 1 + Math.floor(rng() * 2);
+      return { share: w / total, min, max: min + Math.floor(rng() * 3) };
+    })
+  };
+}
 
 /** Relative odds of each shape when "random" is chosen, by difficulty. */
 const RANDOM_WEIGHTS = {
-  low:      { solo: 1, boss: 2, elite: 3, squad: 3, mixed: 2, horde: 2 },
-  moderate: { solo: 1, boss: 3, elite: 2, squad: 3, mixed: 3, horde: 2 },
-  high:     { solo: 2, boss: 4, elite: 2, squad: 2, mixed: 2, horde: 1 },
-  deadly:   { solo: 3, boss: 4, elite: 2, squad: 1, mixed: 1, horde: 1 }
+  low:      { solo: 1, boss: 2, elite: 3, squad: 3, mixed: 2, horde: 2, wild: 2 },
+  moderate: { solo: 1, boss: 3, elite: 2, squad: 3, mixed: 3, horde: 2, wild: 2 },
+  high:     { solo: 2, boss: 4, elite: 2, squad: 2, mixed: 2, horde: 1, wild: 2 },
+  deadly:   { solo: 3, boss: 4, elite: 2, squad: 1, mixed: 1, horde: 1, wild: 1 }
 };
 
 function resolveCount(v, partyCount) {
@@ -100,8 +115,9 @@ export function generateEncounter({
   let best = null;
   for (let i = 0; i < attempts; i++) {
     const tKey = template === "random" ? weightedPick(RANDOM_WEIGHTS[difficulty] ?? RANDOM_WEIGHTS.moderate, rng) : template;
-    const shape = TEMPLATES[tKey];
+    let shape = TEMPLATES[tKey];
     if (!shape) throw new Error(`Unknown template "${tKey}"`);
+    if (shape.dynamic) shape = wildShape(rng);
 
     let subPool = pool;
     if (sameType) {

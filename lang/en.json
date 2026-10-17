@@ -17,7 +17,7 @@
     "Budget": "XP Budget",
     "HomebrewHint": "Not in the 2024 DMG: anything above the High budget. Shown here as up to 150% of High.",
     "Generator": "Random Generator",
-    "Shape": "Encounter shape",
+    "Shape": "Shape",
     "MaxCR": "Max CR",
     "MaxCRHint": "The 2024 DMG warns that creatures with a CR above the party's level can be very dangerous.",
     "PartyLevel": "Party level",
@@ -29,6 +29,7 @@
     "Clear": "Clear encounter",
     "TargetDifficulty": "Target",
     "Generate": "Generate",
+    "GenerateHint": "Roll an encounter at the target difficulty. Click again to reroll.",
     "GeneratedAs": "Generated as",
     "Legendary": "Has legendary actions",
     "EncounterEmpty": "Add creatures from the bestiary, drag NPCs here, or press Generate.",
@@ -84,7 +85,18 @@
       "elite": "Elite pair / trio",
       "squad": "Squad",
       "mixed": "Mixed group",
-      "horde": "Horde"
+      "horde": "Horde",
+      "wild": "Wild"
+    },
+    "TemplateHint": {
+      "random": "Pick one of the shapes at random (weighted by difficulty: bosses are likelier at High)",
+      "solo": "One big creature, ideally with legendary actions",
+      "boss": "One leader (~60% of the XP) backed by a group of weaker minions",
+      "elite": "Two or three tough creatures of the same kind",
+      "squad": "A couple of leaders with a small group of rank and file",
+      "mixed": "Three different creatures in small numbers",
+      "horde": "Lots of weak creatures, one to two per party member",
+      "wild": "No fixed structure: 1-4 random creature kinds in random numbers"
     },
     "Warn": {
       "NoParty": "Add the party to see the budget.",

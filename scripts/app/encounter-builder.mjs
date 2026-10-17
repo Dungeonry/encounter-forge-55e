@@ -9,6 +9,10 @@ import { exportToJournal, placeEncounter } from "../spawn.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 
 const MAX_RESULTS = 200;
+const SHAPE_ICONS = {
+  random: "fa-shuffle", solo: "fa-dragon", boss: "fa-crown", elite: "fa-shield-halved",
+  squad: "fa-people-group", mixed: "fa-layer-group", horde: "fa-users", wild: "fa-dice"
+};
 const uid = () => foundry.utils.randomID();
 
 export class EncounterBuilder extends HandlebarsApplicationMixin(ApplicationV2) {
@@ -36,7 +40,8 @@ export class EncounterBuilder extends HandlebarsApplicationMixin(ApplicationV2) 
       openSheet: EncounterBuilder.#onOpenSheet,
       sources: EncounterBuilder.#onSources,
       resetFilters: EncounterBuilder.#onResetFilters,
-      toggleMinimize: EncounterBuilder.#onToggleMinimize
+      toggleMinimize: EncounterBuilder.#onToggleMinimize,
+      setShape: EncounterBuilder.#onSetShape
     }
   };
 
@@ -126,7 +131,10 @@ export class EncounterBuilder extends HandlebarsApplicationMixin(ApplicationV2) 
       meter: this.#meter(evaluation),
       warnings: evaluation.warnings.map(w => ({ ...w, text: game.i18n.format(`FDE.Warn.${w.key}`, w.data ?? {}) })),
       gen: this.gen,
-      templates: ["random", ...Object.keys(TEMPLATES)].map(k => ({ key: k, label: game.i18n.localize(`FDE.Template.${k}`), selected: k === this.gen.template })),
+      templates: ["random", ...Object.keys(TEMPLATES)].map(k => ({
+        key: k, icon: SHAPE_ICONS[k], selected: k === this.gen.template,
+        label: game.i18n.localize(`FDE.Template.${k}`), hint: game.i18n.localize(`FDE.TemplateHint.${k}`)
+      })),
       crOffsets: [0, 1, 2, 3, 5, "none"].map(v => ({ value: v, label: v === "none" ? game.i18n.localize("FDE.NoCap") : `+${v}`, selected: String(v) === String(this.gen.crOffset) })),
       actionEconomy: this.evalOptions.actionEconomy,
       saved: Object.entries(game.settings.get(MODULE_ID, "savedEncounters") ?? {}).map(([id, s]) => ({ id, name: s.name, selected: id === this.selectedSave })),
@@ -329,6 +337,11 @@ export class EncounterBuilder extends HandlebarsApplicationMixin(ApplicationV2) 
   /* -------------------------------------------- */
   /*  Actions                                      */
   /* -------------------------------------------- */
+
+  static #onSetShape(event, target) {
+    this.gen.template = target.dataset.shape;
+    this.render({ parts: ["encounter"] });
+  }
 
   static #onSetDifficulty(event, target) {
     this.difficulty = target.dataset.difficulty;

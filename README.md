@@ -37,7 +37,7 @@ An encounter is rated by the tier whose budget it fits under. Moderate means it 
 | **Warnings** | CR above party level (the DMG's caution); fragile level-1 characters; a solo with no legendary actions; more than 2 enemies per party member; low-CR fodder against a high-level party; over High. | always |
 
 ## Random generator
-Pick a target (Low/Moderate/High/Deadly\*) and an encounter shape: **Solo**, **Boss + minions**, **Elite pair/trio**, **Squad**, **Mixed group**, **Horde**, or **Random** (weighted by difficulty). The generator:
+Pick a target (Low/Moderate/High/Deadly\*) and an encounter shape: **Solo**, **Boss + minions**, **Elite pair/trio**, **Squad**, **Mixed group**, **Horde**, **Wild** (1–4 random creature kinds in random numbers, no fixed structure), or **Random** (one of the shapes, weighted by difficulty). Click Generate again to reroll. The generator:
 - uses the bestiary filters as its monster pool (CR range, creature type, habitat, 2014/2024 rules);
 - caps CR at *party level + N* (default +2, configurable or uncapped);
 - can keep everything one creature type, and respects a max creature count;
