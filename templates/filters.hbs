@@ -1,0 +1,42 @@
+<section class="fde-col fde-filters">
+  <header class="fde-head">
+    <h3><i class="fa-solid fa-book-skull"></i> {{localize "FDE.Bestiary"}}</h3>
+    <div class="fde-head-buttons">
+      <button type="button" data-action="resetFilters" data-tooltip="{{localize "FDE.ResetFilters"}}"><i class="fa-solid fa-filter-circle-xmark"></i></button>
+      <button type="button" data-action="sources" data-tooltip="{{localize "FDE.Sources"}}"><i class="fa-solid fa-gear"></i></button>
+    </div>
+  </header>
+  <input type="search" placeholder="{{localize "FDE.Search"}}" value="{{filters.search}}" data-field="filters.search">
+  <div class="fde-filter-grid">
+    <label>CR ≥
+      <select data-field="filters.crMin">
+        <option value="">—</option>
+        {{#each crMinOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+      </select>
+    </label>
+    <label>CR ≤
+      <select data-field="filters.crMax">
+        <option value="">—</option>
+        {{#each crMaxOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+      </select>
+    </label>
+    <label>{{localize "FDE.Type"}}
+      <select data-field="filters.type">
+        <option value="">{{localize "FDE.Any"}}</option>
+        {{#each types}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+      </select>
+    </label>
+    <label>{{localize "FDE.Habitat"}}
+      <select data-field="filters.habitat" {{#unless habitats.length}}disabled{{/unless}}>
+        <option value="">{{localize "FDE.Any"}}</option>
+        {{#each habitats}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+      </select>
+    </label>
+    <label class="fde-span2">{{localize "FDE.RulesVersion"}}
+      <select data-field="filters.rules">
+        {{#each rulesOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+      </select>
+    </label>
+  </div>
+  <p class="fde-hint">{{localize "FDE.FiltersHint"}}</p>
+</section>

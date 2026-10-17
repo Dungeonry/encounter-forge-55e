@@ -1,0 +1,23 @@
+<section class="fde-col fde-results">
+  {{#if indexing}}
+    <p class="fde-empty"><i class="fa-solid fa-spinner fa-spin"></i> {{localize "FDE.Indexing"}}</p>
+  {{else}}
+    <p class="fde-count">{{localize "FDE.ResultCount" }}: {{resultCount}}{{#if truncated}} ({{localize "FDE.Truncated"}}){{/if}}</p>
+    <ol class="fde-list fde-results-list">
+      {{#each results}}
+      <li class="fde-row fde-result" draggable="true" data-uuid="{{uuid}}" data-tooltip="{{source}}{{#if rules}} · {{rules}}{{/if}}{{#if hp}} · {{hp}} HP{{/if}}">
+        <img src="{{img}}" alt="" data-action="openSheet">
+        <div class="fde-name">
+          <span>{{name}}{{#if legendary}} <i class="fa-solid fa-crown"></i>{{/if}}</span>
+          <small>{{type}}</small>
+        </div>
+        <span class="fde-cr">CR {{crLabel}}</span>
+        <span class="fde-xp">{{xpLabel}}</span>
+        <a class="fde-icon" data-action="addEnemy" data-tooltip="{{localize "FDE.AddHint"}}"><i class="fa-solid fa-plus"></i></a>
+      </li>
+      {{else}}
+      <li class="fde-empty">{{localize "FDE.NoResults"}}</li>
+      {{/each}}
+    </ol>
+  {{/if}}
+</section>

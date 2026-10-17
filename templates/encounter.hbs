@@ -1,0 +1,85 @@
+<section class="fde-col fde-encounter" data-drop="enemies">
+  <header class="fde-head">
+    <h3><i class="fa-solid fa-skull"></i> {{localize "FDE.Encounter"}}</h3>
+    <div class="fde-head-buttons">
+      <button type="button" data-action="clearEnemies" data-tooltip="{{localize "FDE.Clear"}}"><i class="fa-solid fa-trash"></i></button>
+    </div>
+  </header>
+
+  <div class="fde-target">
+    <span class="fde-target-label">{{localize "FDE.TargetDifficulty"}}</span>
+    <div class="fde-segmented">
+      {{#each difficulties}}
+      <button type="button" class="tier-{{key}} {{#if active}}active{{/if}}" data-action="setDifficulty" data-difficulty="{{key}}"
+              data-tooltip="{{budget}} XP{{#if homebrew}} — {{localize "FDE.HomebrewHint"}}{{/if}}">
+        {{label}}{{#if homebrew}}*{{/if}}
+      </button>
+      {{/each}}
+    </div>
+    <button type="button" class="fde-generate" data-action="generate"><i class="fa-solid fa-wand-magic-sparkles"></i> {{localize "FDE.Generate"}}</button>
+  </div>
+
+  <div class="fde-rating rating-{{evaluation.rating}}">
+    <div class="fde-rating-label">
+      <strong>{{ratingLabel}}</strong>
+      <span>{{numberFormat evaluation.adjustedXP}} XP
+        {{#if actionEconomy}}{{#unless (eq evaluation.multiplier 1)}}<small>({{numberFormat evaluation.totalXP}} × {{evaluation.multiplier}})</small>{{/unless}}{{/if}}
+      </span>
+    </div>
+    <div class="fde-meter" role="meter" aria-valuenow="{{evaluation.adjustedXP}}" aria-valuemax="{{evaluation.budget.deadly}}">
+      <div class="fde-meter-fill {{#if meter.over}}over{{/if}}" style="width: {{meter.fill}}%"></div>
+      <span class="fde-mark tier-low" style="left: {{meter.low}}%" data-tooltip="{{localize "FDE.Difficulty.low"}} {{numberFormat evaluation.budget.low}}"></span>
+      <span class="fde-mark tier-moderate" style="left: {{meter.moderate}}%" data-tooltip="{{localize "FDE.Difficulty.moderate"}} {{numberFormat evaluation.budget.moderate}}"></span>
+      <span class="fde-mark tier-high" style="left: {{meter.high}}%" data-tooltip="{{localize "FDE.Difficulty.high"}} {{numberFormat evaluation.budget.high}}"></span>
+    </div>
+    {{#if lastGenerated}}<p class="fde-hint">{{localize "FDE.GeneratedAs"}} <em>{{lastGenerated.template}}</em>{{#unless lastGenerated.inBand}} — {{localize "FDE.Notify.Closest"}}{{/unless}}</p>{{/if}}
+  </div>
+
+  <ol class="fde-list fde-enemies">
+    {{#each enemies}}
+    <li class="fde-row {{#unless qty}}fde-off{{/unless}}" data-uid="{{uid}}" data-uuid="{{uuid}}">
+      <img src="{{img}}" alt="" data-action="openSheet">
+      <div class="fde-name">
+        <span>{{name}}{{#if legendary}} <i class="fa-solid fa-crown" data-tooltip="{{localize "FDE.Legendary"}}"></i>{{/if}}</span>
+        <small>CR {{crLabel}} · {{xp}} XP{{#if type}} · {{type}}{{/if}}</small>
+      </div>
+      <div class="fde-stepper">
+        <a data-action="stepEnemy" data-step="-1"><i class="fa-solid fa-minus"></i></a>
+        <input type="number" min="0" value="{{qty}}" data-field="enemy.qty">
+        <a data-action="stepEnemy" data-step="1"><i class="fa-solid fa-plus"></i></a>
+      </div>
+      <span class="fde-subtotal">{{subtotal}}</span>
+      <a class="fde-icon" data-action="removeEnemy"><i class="fa-solid fa-xmark"></i></a>
+    </li>
+    {{else}}
+    <li class="fde-empty">{{localize "FDE.EncounterEmpty"}}</li>
+    {{/each}}
+  </ol>
+
+  {{#if warnings.length}}
+  <ul class="fde-warnings">
+    {{#each warnings}}<li class="w-{{level}}"><i class="fa-solid {{#if (eq level "danger")}}fa-skull-crossbones{{else if (eq level "warn")}}fa-triangle-exclamation{{else}}fa-circle-info{{/if}}"></i> {{text}}</li>{{/each}}
+  </ul>
+  {{/if}}
+
+  <div class="fde-summary">
+    <span>{{localize "FDE.TotalXP"}}: <strong>{{numberFormat evaluation.totalXP}}</strong></span>
+    <span>{{localize "FDE.XPPerCharacter"}}: <strong>{{numberFormat evaluation.xpPerCharacter}}</strong></span>
+    <span>{{localize "FDE.Creatures"}}: <strong>{{evaluation.enemyCount}}</strong> vs <strong>{{evaluation.counts.total}}</strong></span>
+    <label class="fde-check" data-tooltip="{{localize "FDE.ActionEconomyHint"}}"><input type="checkbox" {{#if actionEconomy}}checked{{/if}} data-field="actionEconomy"> {{localize "FDE.ActionEconomy"}}</label>
+  </div>
+
+  <footer class="fde-actions">
+    <button type="button" data-action="place"><i class="fa-solid fa-map-location-dot"></i> {{localize "FDE.Place"}}</button>
+    <button type="button" data-action="journal"><i class="fa-solid fa-book-open"></i> {{localize "FDE.Journal"}}</button>
+    <button type="button" data-action="save"><i class="fa-solid fa-floppy-disk"></i> {{localize "FDE.Save"}}</button>
+    <div class="fde-saved">
+      <select data-field="savedSelect">
+        <option value="">{{localize "FDE.SavedEncounters"}}</option>
+        {{#each saved}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
+      </select>
+      <button type="button" data-action="load" data-tooltip="{{localize "FDE.Load"}}"><i class="fa-solid fa-folder-open"></i></button>
+      <button type="button" data-action="deleteSaved" data-tooltip="{{localize "FDE.Delete"}}"><i class="fa-solid fa-trash"></i></button>
+    </div>
+  </footer>
+</section>

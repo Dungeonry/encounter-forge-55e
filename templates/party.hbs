@@ -1,0 +1,58 @@
+<section class="fde-col fde-party" data-drop="party">
+  <header class="fde-head">
+    <h3><i class="fa-solid fa-users"></i> {{localize "FDE.Party"}}</h3>
+    <div class="fde-head-buttons">
+      <button type="button" data-action="loadParty" data-tooltip="{{localize "FDE.LoadPartyHint"}}"><i class="fa-solid fa-rotate"></i></button>
+      <button type="button" data-action="addCustomPC" data-tooltip="{{localize "FDE.AddCharacter"}}"><i class="fa-solid fa-user-plus"></i></button>
+    </div>
+  </header>
+
+  <ol class="fde-list">
+    {{#each party}}
+    <li class="fde-row {{#if isAlly}}fde-ally{{/if}}" data-uid="{{uid}}" {{#if uuid}}data-uuid="{{uuid}}"{{/if}}>
+      <img src="{{img}}" alt="" {{#if uuid}}data-action="openSheet"{{/if}}>
+      <div class="fde-name">
+        {{#if uuid}}<span>{{name}}</span>{{else}}<input type="text" value="{{name}}" data-field="party.name">{{/if}}
+        <small>{{#if isAlly}}{{localize "FDE.Ally"}}{{else}}{{localize "FDE.Character"}}{{/if}}</small>
+      </div>
+      {{#if isAlly}}
+        <label class="fde-mini">CR <input type="text" value="{{crLabel}}" data-field="party.cr"></label>
+      {{else}}
+        <label class="fde-mini">{{localize "FDE.Lvl"}} <input type="number" min="1" max="20" value="{{level}}" data-field="party.level"></label>
+      {{/if}}
+      <label class="fde-mini">× <input type="number" min="1" value="{{qty}}" data-field="party.qty"></label>
+      <a class="fde-icon" data-action="removeParty"><i class="fa-solid fa-xmark"></i></a>
+    </li>
+    {{else}}
+    <li class="fde-empty">{{localize "FDE.PartyEmpty"}}</li>
+    {{/each}}
+  </ol>
+  <p class="fde-hint"><i class="fa-solid fa-hand-pointer"></i> {{localize "FDE.PartyDropHint"}}</p>
+
+  <section class="fde-budget">
+    <h4>{{localize "FDE.Budget"}} <small>({{evaluation.counts.pcs}} {{localize "FDE.PCs"}}{{#if evaluation.counts.allies}}, {{evaluation.counts.allies}} {{localize "FDE.Allies"}}{{/if}})</small></h4>
+    <table>
+      <tr class="tier-low"><th>{{localize "FDE.Difficulty.low"}}</th><td>{{numberFormat evaluation.budget.low}}</td></tr>
+      <tr class="tier-moderate"><th>{{localize "FDE.Difficulty.moderate"}}</th><td>{{numberFormat evaluation.budget.moderate}}</td></tr>
+      <tr class="tier-high"><th>{{localize "FDE.Difficulty.high"}}</th><td>{{numberFormat evaluation.budget.high}}</td></tr>
+      <tr class="tier-deadly"><th>{{localize "FDE.Difficulty.deadly"}} <i class="fa-solid fa-flask" data-tooltip="{{localize "FDE.HomebrewHint"}}"></i></th><td>{{numberFormat evaluation.budget.deadly}}</td></tr>
+    </table>
+  </section>
+
+  <section class="fde-generator">
+    <h4><i class="fa-solid fa-dice-d20"></i> {{localize "FDE.Generator"}}</h4>
+    <label>{{localize "FDE.Shape"}}
+      <select data-field="gen.template">
+        {{#each templates}}<option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+      </select>
+    </label>
+    <label>{{localize "FDE.MaxCR"}}
+      <select data-field="gen.crOffset" data-tooltip="{{localize "FDE.MaxCRHint"}}">
+        {{#each crOffsets}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{localize "FDE.PartyLevel"}} {{label}}</option>{{/each}}
+      </select>
+    </label>
+    <label>{{localize "FDE.MaxCreatures"}} <input type="number" min="1" max="30" value="{{gen.maxCreatures}}" data-field="gen.maxCreatures"></label>
+    <label class="fde-check"><input type="checkbox" {{#if gen.sameType}}checked{{/if}} data-field="gen.sameType"> {{localize "FDE.SameType"}}</label>
+    <p class="fde-hint">{{localize "FDE.GeneratorHint"}}</p>
+  </section>
+</section>
