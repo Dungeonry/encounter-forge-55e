@@ -48,7 +48,7 @@ If the filters make the target impossible (e.g. *Solo* with no single creature i
 ## Other features
 - Party auto-loads from the dnd5e **Primary Party** group, or from player-owned characters if there's none. Add characters by level, set quantities, and edit an ally's CR.
 - Bestiary search across any Actor compendiums you choose (gear icon) plus world NPCs. Duplicate statblocks are merged, preferring the 2024 version.
-- **Place on scene**: imports monsters into an "Encounter Forge" folder once, places tokens (hidden by default) at the view centre and adds them to the combat tracker.
+- **Place on scene** imports monsters into an "Encounter Forge" folder once and places tokens (hidden by default) at the view centre. **Place + combat** also adds them to the scene's combat tracker, without starting it.
 - **To journal**: writes a journal page with linked creatures, XP total, XP per character and the budget.
 - **Save/Load** named encounters (world setting).
 

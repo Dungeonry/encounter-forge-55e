@@ -70,7 +70,8 @@
   </div>
 
   <footer class="fde-actions">
-    <button type="button" data-action="place"><i class="fa-solid fa-map-location-dot"></i> {{localize "FDE.Place"}}</button>
+    <button type="button" data-action="place" data-tooltip="{{localize "FDE.PlaceHint"}}"><i class="fa-solid fa-map-location-dot"></i> {{localize "FDE.Place"}}</button>
+    <button type="button" data-action="place" data-combat="true" data-tooltip="{{localize "FDE.PlaceCombatHint"}}"><i class="fa-solid fa-swords"></i> {{localize "FDE.PlaceCombat"}}</button>
     <button type="button" data-action="journal"><i class="fa-solid fa-book-open"></i> {{localize "FDE.Journal"}}</button>
     <button type="button" data-action="save"><i class="fa-solid fa-floppy-disk"></i> {{localize "FDE.Save"}}</button>
     <div class="fde-saved">

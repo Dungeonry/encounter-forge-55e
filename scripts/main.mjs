@@ -26,7 +26,6 @@ Hooks.once("init", () => {
   });
   reg("actionEconomy", { scope: "world", config: true, type: Boolean, default: false });
   reg("placeHidden", { scope: "world", config: true, type: Boolean, default: true });
-  reg("addToCombat", { scope: "world", config: true, type: Boolean, default: true });
   reg("importFolder", { scope: "world", config: true, type: String, default: "Encounter Forge" });
   reg("includeWorldActors", { scope: "world", config: false, type: Boolean, default: true, onChange: invalidateIndex });
   reg("compendiums", { scope: "world", config: false, type: Array, default: [], onChange: invalidateIndex });

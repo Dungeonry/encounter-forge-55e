@@ -408,11 +408,12 @@ export class EncounterBuilder extends HandlebarsApplicationMixin(ApplicationV2) 
     this.render({ parts: ["encounter"] });
   }
 
-  static async #onPlace() {
+  /** data-combat="true" on the button also adds the tokens to the combat tracker. */
+  static async #onPlace(event, target) {
     if (!this.enemies.length) return;
     await placeEncounter(this.enemies, {
       hidden: game.settings.get(MODULE_ID, "placeHidden"),
-      combat: game.settings.get(MODULE_ID, "addToCombat")
+      combat: target.dataset.combat === "true"
     });
   }
 
