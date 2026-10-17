@@ -87,21 +87,21 @@
 .fde-builder .fde-check { display: flex; align-items: center; gap: 0.35rem; justify-content: flex-start !important; }
 
 /* Target difficulty segmented control */
-.fde-builder .fde-target { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-.fde-builder .fde-target-label { font-weight: 600; }
+.fde-builder .fde-target { display: flex; align-items: center; gap: 0.5rem; }
+.fde-builder .fde-target-label { font-weight: 600; flex: none; width: 3.5rem; }
 .fde-builder .fde-segmented { display: flex; flex: 1; }
-.fde-builder .fde-segmented button { flex: 1; border-radius: 0; margin: 0; border-bottom: 3px solid transparent; }
+.fde-builder .fde-segmented button { flex: 1 1 0; min-width: 0; border-radius: 0; margin: 0; border-bottom: 3px solid transparent; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .fde-builder .fde-segmented button:first-child { border-radius: 4px 0 0 4px; }
 .fde-builder .fde-segmented button:last-child { border-radius: 0 4px 4px 0; }
 .fde-builder .fde-segmented button.tier-low { border-bottom-color: var(--fde-low); }
 .fde-builder .fde-segmented button.tier-moderate { border-bottom-color: var(--fde-moderate); }
 .fde-builder .fde-segmented button.tier-high { border-bottom-color: var(--fde-high); }
 .fde-builder .fde-segmented button.tier-deadly { border-bottom-color: var(--fde-deadly); }
-.fde-builder .fde-segmented button.active { font-weight: 700; box-shadow: inset 0 0 0 2px currentColor; }
-.fde-builder .fde-shapes { display: flex; flex-wrap: wrap; gap: 0.25rem; flex: 1; }
-.fde-builder .fde-shapes button { flex: 1 1 auto; width: auto; margin: 0; padding: 0 0.5rem; font-size: 0.8rem; white-space: nowrap; }
-.fde-builder .fde-shapes button.active { font-weight: 700; box-shadow: inset 0 0 0 2px currentColor; }
-.fde-builder .fde-generate { flex: none; width: auto; padding: 0 0.75rem; font-weight: 600; }
+.fde-builder .fde-segmented button.active,
+.fde-builder .fde-shapes button.active { background: rgba(127, 127, 127, 0.28); box-shadow: inset 0 0 0 2px currentColor; }
+.fde-builder .fde-shapes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.25rem; flex: 1; }
+.fde-builder .fde-shapes button { width: 100%; height: 1.9rem; margin: 0; padding: 0 0.35rem; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fde-builder .fde-generate { flex: none; width: 100%; height: 2.2rem; margin: 0; font-weight: 600; }
 
 /* Rating + meter */
 .fde-builder .fde-rating { --tier: var(--fde-trivial); padding: 0.5rem; border-radius: 6px; background: var(--fde-tint); border-left: 5px solid var(--tier); }
@@ -131,7 +131,7 @@
 .fde-builder .fde-summary { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; font-size: 0.85rem; margin-top: auto; padding-top: 0.25rem; border-top: 1px solid var(--fde-line); }
 .fde-builder .fde-actions { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
 .fde-builder .fde-actions > button { flex: 1; white-space: nowrap; }
-.fde-builder .fde-saved { display: flex; gap: 0.25rem; flex: 1 1 100%; }
+.fde-builder .fde-saved { display: flex; gap: 0.25rem; flex: 1; }
 .fde-builder .fde-saved select { flex: 1; }
 .fde-builder .fde-saved button { width: 2rem; flex: none; }
 
