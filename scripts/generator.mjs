@@ -199,3 +199,76 @@ function fitToBand(enemies, band, evaluate, maxCreatures) {
     } else return;
   }
 }
+
+/**
+ * Swap one creature of an existing encounter for a different one, keeping everything else.
+ *
+ * The replacement takes over roughly the same share of XP (its count may change: two ogres can
+ * become five gnolls), and is scored against the same band as generateEncounter. If the
+ * encounter wasn't in the band to begin with (hand-tuned), it stays as close to its current XP.
+ *
+ * @param {object} args
+ * @param {Array} args.monsters                       candidate pool (already filtered)
+ * @param {Array} args.party
+ * @param {Array<{id:string, cr:number, xp:number, qty:number, type?:string, legendary?:boolean}>} args.enemies  the current encounter
+ * @param {number} args.index                         which entry of `enemies` to replace
+ * @param {"low"|"moderate"|"high"|"deadly"} args.difficulty
+ * @param {Set<string>} [args.exclude]                ids not to pick (e.g. creatures already rerolled away)
+ * @param {boolean} [args.sameType=false]             keep the creature type of the one being replaced
+ * @param {number} [args.maxCreatures=10]
+ * @param {object} [args.evalOptions]
+ * @param {() => number} [args.rng=Math.random]
+ * @returns {{monster:object, qty:number, evaluation:object, inBand:boolean} | null}
+ */
+export function rerollCreature({
+  monsters, party, enemies, index, difficulty, exclude = new Set(), sameType = false,
+  maxCreatures = 10, evalOptions = {}, rng = Math.random
+}) {
+  const current = enemies?.[index];
+  if (!current || !party?.length) return null;
+  const others = enemies.filter((_, i) => i !== index);
+  const taken = new Set([current.id, ...others.map(e => e.id)]);
+  let pool = (monsters ?? []).filter(m => m.xp > 0 && !taken.has(m.id));
+  if (sameType && current.type) pool = pool.filter(m => m.type === current.type);
+  const fresh = pool.filter(m => !exclude.has(m.id));
+  if (fresh.length) pool = fresh;
+  if (!pool.length) return null;
+
+  const evaluate = list => evaluateEncounter(party, list, evalOptions);
+  const before = evaluate(enemies);
+  const band = targetBand(difficulty, before.budget);
+  const wasInBand = before.adjustedXP >= band.min && before.adjustedXP <= band.max;
+  const aim = wasInBand ? before.adjustedXP : before.adjustedXP || bandAim(band);
+  const slotXP = (current.xp || 0) * Math.max(1, current.qty);
+  const room = Math.max(1, maxCreatures - others.reduce((s, e) => s + (e.qty ?? 1), 0));
+
+  const options = [];
+  for (const m of pool) {
+    const ideal = Math.round(slotXP / m.xp);
+    if (ideal < 1) continue; // one of them alone is worth over twice the slot
+    for (const qty of new Set([ideal - 1, ideal, ideal + 1, current.qty])) {
+      if (qty < 1 || qty > room) continue;
+      const evaluation = evaluate([...others, { ...m, qty }]);
+      const xp = evaluation.adjustedXP;
+      const inBand = xp >= band.min && xp <= band.max;
+      let score = Math.abs(xp - aim) / (aim || 1);
+      if (wasInBand && !inBand) score += 10;
+      if (qty !== current.qty) score += 0.05;                // a like-for-like count is nicer, if it fits
+      if (current.legendary && !m.legendary) score += 0.1;  // keep a boss a boss
+      options.push({ monster: m, qty, evaluation, inBand, score });
+    }
+  }
+  if (!options.length) return null;
+
+  // Best quantity per creature, then a random pick among the closest few for variety.
+  const perMonster = new Map();
+  for (const o of options) {
+    const prev = perMonster.get(o.monster.id);
+    if (!prev || o.score < prev.score) perMonster.set(o.monster.id, o);
+  }
+  const ranked = [...perMonster.values()].sort((a, b) => a.score - b.score);
+  const cutoff = ranked[0].score + 0.1;
+  const top = ranked.filter(o => o.score <= cutoff).slice(0, 8);
+  const pick = top[Math.floor(rng() * top.length)];
+  return { monster: pick.monster, qty: pick.qty, evaluation: pick.evaluation, inBand: pick.inBand };
+}

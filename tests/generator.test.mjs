@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { generateEncounter, TEMPLATES } from "../scripts/generator.mjs";
+import { generateEncounter, rerollCreature, TEMPLATES } from "../scripts/generator.mjs";
 import { crToXP, targetBand, partyBudget, CR_VALUES } from "../scripts/rules.mjs";
 
 /** Deterministic PRNG (mulberry32). */
@@ -66,4 +66,32 @@ test("allies make the generator spend more XP", () => {
 test("returns null on empty input", () => {
   assert.equal(generateEncounter({ monsters: [], party: pcs(4, 1), difficulty: "low" }), null);
   assert.equal(generateEncounter({ monsters: MONSTERS, party: [], difficulty: "low" }), null);
+});
+
+test("rerollCreature swaps one creature, keeps the rest, and stays in band", () => {
+  const party = pcs(4, 6);
+  const band = targetBand("high", partyBudget(party));
+  for (let seed = 1; seed <= 20; seed++) {
+    const rng = seeded(seed);
+    const r = generateEncounter({ monsters: MONSTERS, party, difficulty: "high", template: "mixed", rng });
+    const enemies = r.enemies.map(e => ({ ...e.monster, qty: e.qty }));
+    const index = seed % enemies.length;
+    const swap = rerollCreature({ monsters: MONSTERS, party, enemies, index, difficulty: "high", rng });
+    assert.ok(swap, `seed ${seed} found a replacement`);
+    assert.ok(!enemies.some(e => e.id === swap.monster.id), "replacement is a new creature");
+    assert.ok(swap.evaluation.adjustedXP >= band.min && swap.evaluation.adjustedXP <= band.max);
+    assert.equal(swap.inBand, true);
+  }
+});
+
+test("rerollCreature honours exclude and sameType, and returns null when nothing is left", () => {
+  const party = pcs(4, 5);
+  const enemies = [{ ...MONSTERS.find(m => m.id === "beast-5"), qty: 1 }];
+  const exclude = new Set(MONSTERS.filter(m => m.type === "beast" && m.cr === 4).map(m => m.id));
+  for (let seed = 1; seed <= 10; seed++) {
+    const swap = rerollCreature({ monsters: MONSTERS, party, enemies, index: 0, difficulty: "moderate", sameType: true, exclude, rng: seeded(seed) });
+    assert.equal(swap.monster.type, "beast");
+    assert.ok(!exclude.has(swap.monster.id));
+  }
+  assert.equal(rerollCreature({ monsters: [MONSTERS[0]], party, enemies: [{ ...MONSTERS[0], qty: 1 }], index: 0, difficulty: "low" }), null);
 });

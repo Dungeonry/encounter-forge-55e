@@ -2,7 +2,7 @@ import { MODULE_ID, TEMPLATE_PATH } from "../constants.mjs";
 import {
   CR_VALUES, DEADLY_MULTIPLIER, TARGET_DIFFICULTIES, averagePartyLevel, crToXP, evaluateEncounter, formatCR, parseCR, targetBand
 } from "../rules.mjs";
-import { TEMPLATES, generateEncounter } from "../generator.mjs";
+import { TEMPLATES, generateEncounter, rerollCreature } from "../generator.mjs";
 import { availableActorPacks, filterIndex, getMonsterIndex, indexFacets, invalidateIndex } from "../monster-index.mjs";
 import { exportToJournal, placeEncounter } from "../spawn.mjs";
 
@@ -29,6 +29,7 @@ export class EncounterBuilder extends HandlebarsApplicationMixin(ApplicationV2) 
       removeParty: EncounterBuilder.#onRemoveParty,
       addEnemy: EncounterBuilder.#onAddEnemy,
       removeEnemy: EncounterBuilder.#onRemoveEnemy,
+      rerollEnemy: EncounterBuilder.#onRerollEnemy,
       stepEnemy: EncounterBuilder.#onStepEnemy,
       clearEnemies: EncounterBuilder.#onClearEnemies,
       generate: EncounterBuilder.#onGenerate,
@@ -393,12 +394,7 @@ export class EncounterBuilder extends HandlebarsApplicationMixin(ApplicationV2) 
 
   static async #onGenerate() {
     if (!this.party.length) return ui.notifications.warn(game.i18n.localize("FDE.Warn.NoParty"));
-    this.index ??= await getMonsterIndex();
-    const { search, ...rest } = this.#browserFilters();
-    const avg = averagePartyLevel(this.party) || 1;
-    const cap = this.gen.crOffset === "none" ? null : Math.max(1, avg + Number(this.gen.crOffset));
-    if (cap !== null) rest.crMax = rest.crMax === null ? cap : Math.min(rest.crMax, cap);
-    const pool = filterIndex(this.index, rest);
+    const pool = await this.#generatorPool();
     if (!pool.length) return ui.notifications.warn(game.i18n.localize("FDE.Notify.EmptyPool"));
 
     const result = generateEncounter({
@@ -418,6 +414,46 @@ export class EncounterBuilder extends HandlebarsApplicationMixin(ApplicationV2) 
       inBand: result.inBand
     };
     if (!result.inBand) ui.notifications.info(game.i18n.localize("FDE.Notify.Closest"));
+    this.render({ parts: ["encounter"] });
+  }
+
+  /** Bestiary filters (minus search) plus the generator's CR cap. */
+  async #generatorPool() {
+    this.index ??= await getMonsterIndex();
+    const { search, ...rest } = this.#browserFilters();
+    const avg = averagePartyLevel(this.party) || 1;
+    const cap = this.gen.crOffset === "none" ? null : Math.max(1, avg + Number(this.gen.crOffset));
+    if (cap !== null) rest.crMax = rest.crMax === null ? cap : Math.min(rest.crMax, cap);
+    return filterIndex(this.index, rest);
+  }
+
+  /** Swap one row for a different creature of similar XP, leaving the rest of the encounter alone. */
+  static async #onRerollEnemy(event, target) {
+    const index = this.enemies.findIndex(x => x.uid === target.closest("[data-uid]").dataset.uid);
+    if (index < 0) return;
+    if (!this.party.length) return ui.notifications.warn(game.i18n.localize("FDE.Warn.NoParty"));
+    const pool = await this.#generatorPool();
+    const current = this.enemies[index];
+    // Remember what this row has already been, so repeated clicks keep showing new creatures.
+    const seen = new Set([...(current.rerolled ?? []), current.uuid]);
+    const result = rerollCreature({
+      monsters: pool,
+      party: this.party,
+      enemies: this.enemies.map(e => ({ ...e, id: e.uuid })),
+      index,
+      difficulty: this.difficulty,
+      exclude: seen,
+      sameType: this.gen.sameType,
+      maxCreatures: this.gen.maxCreatures,
+      evalOptions: this.evalOptions
+    });
+    if (!result) return ui.notifications.warn(game.i18n.localize("FDE.Notify.NoReroll"));
+    const m = result.monster;
+    this.enemies[index] = {
+      uid: current.uid, uuid: m.uuid, name: m.name, img: m.img, cr: m.cr, xp: m.xp,
+      legendary: !!m.legendary, type: m.type, qty: result.qty,
+      rerolled: seen.has(m.uuid) ? [current.uuid] : [...seen]
+    };
     this.render({ parts: ["encounter"] });
   }
 
@@ -445,7 +481,7 @@ export class EncounterBuilder extends HandlebarsApplicationMixin(ApplicationV2) 
     if (!name) return;
     const saved = foundry.utils.deepClone(game.settings.get(MODULE_ID, "savedEncounters") ?? {});
     const id = uid();
-    saved[id] = { name, enemies: this.enemies.map(({ uid, ...e }) => e), difficulty: this.difficulty };
+    saved[id] = { name, enemies: this.enemies.map(({ uid, rerolled, ...e }) => e), difficulty: this.difficulty };
     await game.settings.set(MODULE_ID, "savedEncounters", saved);
     this.selectedSave = id;
     this.render({ parts: ["encounter"] });

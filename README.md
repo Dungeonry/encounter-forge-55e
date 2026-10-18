@@ -43,6 +43,8 @@ Pick a target (Low/Moderate/High/Deadly\*) and an encounter shape: **Solo**, **B
 - can keep everything one creature type, and respects a max creature count;
 - aims for 80% of the way into the target tier's XP window, then adjusts the numbers until the result rates at that tier, using **the same evaluator the meter shows** (including allies and the optional action-economy adjustment).
 
+Like most of an encounter but not one creature? Click the **dice** on its row to swap just that creature for a different one worth about the same XP. Its count can change (two ogres might become five gnolls) so the encounter keeps its tier, and nothing else is touched. Click again for another option; a row won't repeat a creature until it runs out of new ones.
+
 If the filters make the target impossible (e.g. *Solo* with no single creature in the XP window), you get the closest result and a notice.
 
 ## Other features
